@@ -13,6 +13,7 @@ export const PERMISSIONS = [
   // trainers
   "trainers:read",
   "trainers:write",
+  "trainers:delete",
   // attendance
   "attendance:read",
   "attendance:write",

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Bell } from "lucide-react";
-import { PlaceholderPage } from "@/shared/components";
+import { NotificationsList } from "@/features/notifications";
 
 export const metadata: Metadata = { title: "Notifications" };
 
 export default function NotificationsPage() {
   return (
-    <PlaceholderPage
-      title="Notifications"
-      description="Review system and member notifications."
-      milestone="Milestone 4"
-      icon={Bell}
-    />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
+        <p className="text-sm text-muted-foreground">Review system and member notifications.</p>
+      </div>
+      <NotificationsList />
+    </div>
   );
 }

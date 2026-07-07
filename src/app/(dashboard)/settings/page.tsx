@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Settings } from "lucide-react";
-import { PlaceholderPage } from "@/shared/components";
+import { SettingsView } from "@/features/settings";
 
 export const metadata: Metadata = { title: "Settings" };
 
 export default function SettingsPage() {
   return (
-    <PlaceholderPage
-      title="Settings"
-      description="Manage your account, gym, and tenant configuration."
-      milestone="Milestone 4"
-      icon={Settings}
-    />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+        <p className="text-sm text-muted-foreground">Manage your account, gym, and preferences.</p>
+      </div>
+      <SettingsView />
+    </div>
   );
 }

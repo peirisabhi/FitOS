@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Megaphone } from "lucide-react";
-import { PlaceholderPage } from "@/shared/components";
+import { NoticeBoardList } from "@/features/notice-board";
 
 export const metadata: Metadata = { title: "Notice Board" };
 
 export default function NoticeBoardPage() {
   return (
-    <PlaceholderPage
-      title="Notice Board"
-      description="Post announcements visible to staff and members."
-      milestone="Milestone 4"
-      icon={Megaphone}
-    />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Notice Board</h1>
+        <p className="text-sm text-muted-foreground">Post announcements visible to staff and members.</p>
+      </div>
+      <NoticeBoardList />
+    </div>
   );
 }

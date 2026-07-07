@@ -13,7 +13,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   owner: [
     "dashboard:view",
     "members:read", "members:write", "members:delete",
-    "trainers:read", "trainers:write",
+    "trainers:read", "trainers:write", "trainers:delete",
     "attendance:read", "attendance:write",
     "payments:read", "payments:write",
     "memberships:read", "memberships:write",

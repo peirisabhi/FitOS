@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { UtensilsCrossed } from "lucide-react";
-import { PlaceholderPage } from "@/shared/components";
+import { MealPlansTable } from "@/features/meal-plans";
 
 export const metadata: Metadata = { title: "Meal Plans" };
 
 export default function MealPlansPage() {
   return (
-    <PlaceholderPage
-      title="Meal Plans"
-      description="Assign and track nutrition plans."
-      milestone="Milestone 2"
-      icon={UtensilsCrossed}
-    />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Meal Plans</h1>
+        <p className="text-sm text-muted-foreground">Assign and track nutrition plans.</p>
+      </div>
+      <MealPlansTable />
+    </div>
   );
 }

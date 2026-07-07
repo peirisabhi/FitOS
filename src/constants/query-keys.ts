@@ -17,19 +17,47 @@ export const queryKeys = {
   },
   attendance: {
     all: () => ["attendance"] as const,
+    list: (filters?: Record<string, unknown>) => ["attendance", "list", filters ?? {}] as const,
   },
   payments: {
     all: () => ["payments"] as const,
+    list: (filters?: Record<string, unknown>) => ["payments", "list", filters ?? {}] as const,
   },
   memberships: {
     all: () => ["memberships"] as const,
+    list: (filters?: Record<string, unknown>) => ["memberships", "list", filters ?? {}] as const,
   },
   sessions: {
     all: () => ["sessions"] as const,
+    list: (filters?: Record<string, unknown>) => ["sessions", "list", filters ?? {}] as const,
+  },
+  mealPlans: {
+    all: () => ["meal-plans"] as const,
+    list: (filters?: Record<string, unknown>) => ["meal-plans", "list", filters ?? {}] as const,
+  },
+  workoutPlans: {
+    all: () => ["workout-plans"] as const,
+    list: (filters?: Record<string, unknown>) => ["workout-plans", "list", filters ?? {}] as const,
   },
   dashboard: {
     owner: () => ["dashboard", "owner"] as const,
     trainer: () => ["dashboard", "trainer"] as const,
     member: () => ["dashboard", "member"] as const,
+  },
+  reports: {
+    summary: (period?: string) => ["reports", "summary", period ?? "12m"] as const,
+  },
+  notifications: {
+    all: () => ["notifications"] as const,
+    list: (filters?: Record<string, unknown>) => ["notifications", "list", filters ?? {}] as const,
+  },
+  noticeBoard: {
+    all: () => ["notice-board"] as const,
+    list: (filters?: Record<string, unknown>) => ["notice-board", "list", filters ?? {}] as const,
+  },
+  settings: {
+    organization: () => ["settings", "organization"] as const,
+    profile: () => ["settings", "profile"] as const,
+    notificationPreferences: () => ["settings", "notification-preferences"] as const,
   },
 } as const;

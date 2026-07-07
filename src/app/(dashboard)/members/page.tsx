@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Users } from "lucide-react";
-import { PlaceholderPage } from "@/shared/components";
+import { MembersTable } from "@/features/members";
 
 export const metadata: Metadata = { title: "Members" };
 
 export default function MembersPage() {
   return (
-    <PlaceholderPage
-      title="Members"
-      description="Manage member profiles, plans, and history."
-      milestone="Milestone 2"
-      icon={Users}
-    />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Members</h1>
+        <p className="text-sm text-muted-foreground">Manage member profiles, plans, and trainer assignments.</p>
+      </div>
+      <MembersTable />
+    </div>
   );
 }

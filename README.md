@@ -1,10 +1,17 @@
-# GymOS — Milestone 1 + 2
+# GymOS — Milestones 1–4 complete
 
 Milestone 1: tooling, folder structure, theme, design system, base layouts, config-driven
 navigation, mock auth, MSW + repository layer, route guards, dashboard shell.
 
 Milestone 2: the three named dashboard experiences (Owner, Trainer, Member) with real widget
-compositions over mocked data.
+compositions over mocked data, plus full CRUD for Members, Trainers, Meal Plans, and Workout Plans.
+
+Milestone 3: full CRUD for Memberships (plans), Attendance, Payments, and Sessions.
+
+Milestone 4: Reports (analytics + CSV export), Notifications, Notice Board, and Settings.
+
+Every module in the original brief now has a real, working page — there are no more placeholder
+screens anywhere in the app.
 
 See `GymOS-Architecture-v1.md` for the full architecture write-up (folder structure rationale,
 dependency graph, routing strategy, state management strategy, repository pattern, RBAC/PBAC
@@ -96,21 +103,83 @@ a follow-up pass without touching the architecture.
   (`DashboardShell` now imports `useSession` from the `features/auth` barrel, not
   `features/auth/hooks` directly).
 
-## Scope note
+## Milestone 2, completed: Members / Trainers / Meal Plans / Workout Plans
 
-"Owner/Trainer/Member module" in Milestone 2 was interpreted as the three named dashboard
-experiences from the brief's Owner/Trainer/Member Dashboard sections — not full CRUD screens for
-Members/Trainers/Meal Plans/Workout Plans (those aren't explicitly assigned to a milestone in the
-original plan; they remain placeholder pages until you want them scheduled).
+Four full modules, each following the same repository pattern end to end (types → schemas →
+repository → service → hooks → components → MSW handlers → fixtures → page), replacing their
+Milestone 1 placeholder pages:
+
+- **Members** (`features/members`): searchable, paginated directory (name, email, plan, status,
+  trainer, joined date). Add / edit via a form dialog (React Hook Form + Zod), remove via a
+  confirm dialog. Gated by `members:read` / `members:write` / `members:delete`.
+- **Trainers** (`features/trainers`): same pattern — specialty, status, rating, active clients.
+  Gated by `trainers:read` / `trainers:write` / `trainers:delete` (delete added this pass, for
+  symmetry with `members:delete` — owner + super_admin only).
+- **Meal Plans** (`features/meal-plans`): assign/edit/remove a member's nutrition plan (plan name,
+  daily calories, compliance %). Gated by `meal-plans:read` / `meal-plans:write`.
+- **Workout Plans** (`features/workout-plans`): assign/edit/remove a member's training program
+  (plan name, focus, week progress). Gated by `workout-plans:read` / `workout-plans:write`.
+
+New shared pieces that came out of building these four: `buildQueryString()` (`lib/utils.ts`) for
+turning `ListQueryParams` into a query string, and `ConfirmDialog` (`components/overlays`) as the
+one confirm/cancel dialog every destructive action reuses. Search is server-side (hits the mock
+API), pagination is client-side via the existing `DataTable` (documented in Milestone 1 as the
+seam to swap in manual/server-side pagination or virtualization once real data volumes justify
+it — still true, just deferred).
+
+## What's in Milestone 3
+
+Four more full modules, same end-to-end pattern (types → schemas → repository → service → hooks
+→ components → MSW handlers → fixtures → page):
+
+- **Memberships** (`features/memberships`): the *plans* themselves (Monthly Basic, Annual Elite,
+  etc.) — price, billing cycle, duration, active subscriber count. Create/edit/remove a plan.
+  Gated by `memberships:read` / `memberships:write`. (Note: this is distinct from the **Members**
+  module built in Milestone 2, which manages individual member profiles.)
+- **Attendance** (`features/attendance`): front-desk check-in/check-out log. "Log Check-in" records
+  an arrival; a per-row "Check out" action stamps the departure time; records can be corrected via
+  delete. Gated by `attendance:read` / `attendance:write`.
+- **Payments** (`features/payments`): invoices/dues (member, amount, method, due date, status).
+  "Record Payment" creates one as `pending`; a per-row "Mark as paid" action stamps it `paid`.
+  Gated by `payments:read` / `payments:write`.
+- **Sessions** (`features/sessions`): class and personal-training bookings. The page has a **List**
+  tab (searchable table, cancel/remove actions) and a **Calendar** tab reusing the Milestone 1
+  `Calendar` (FullCalendar) composite, color-coded by status. The schedule form splits date/start
+  time/end time into separate native inputs for a friendlier UX, then composes them into ISO
+  start/end on submit. Gated by `sessions:read` / `sessions:write`.
+
+## What's in Milestone 4
+
+- **Reports** (`features/reports`): revenue / attendance / membership-growth trend charts, a
+  period selector (3/6/12 months), MetricCards, and a trainer performance table. "Export CSV"
+  (`reports:export`) is genuinely functional, not mocked — `lib/csv.ts` serializes the currently
+  loaded data and triggers a real browser download via a Blob + temporary anchor, no backend
+  endpoint required. Deliberately uses its own local types/charts rather than importing the
+  dashboard feature's — kept decoupled per the no-feature-coupling rule, even though the shapes
+  are structurally similar.
+- **Notifications** (`features/notifications`): a real notification center — list, per-item mark
+  as read, "mark all as read", delete. No create form (notifications are system-generated, not
+  user-authored). Gated by `notifications:read` / `notifications:write`.
+- **Notice Board** (`features/notice-board`): announcement feed with pin/unpin, edit, delete, and
+  audience targeting (Everyone / Staff only / Members only). Gated by `notice-board:read` /
+  `notice-board:write`.
+- **Settings** (`features/settings`): a tabbed page — Profile (edit your own name; updates the
+  navbar immediately via the auth store), Organization (tenant name + plan; **owner/super_admin
+  can edit, manager sees it read-only** — reflecting that `settings:write` isn't in the manager
+  permission set while `settings:read` is), Appearance (light/dark/system), and Notification
+  preferences (toggles). Trainer, receptionist, and member don't have `settings:read` at all, so
+  they never see this page in the sidebar and are redirected by middleware if they hit the URL
+  directly — this was already true from the Milestone 1 permission matrix, no new gating needed.
+
+Every module now has a real implementation — no placeholder pages remain anywhere in the app.
 
 ## Not yet built (by design)
 
-- Real feature data/repositories for Members/Trainers/Attendance/Payments/etc. — Milestones 3–4.
 - PWA (manifest exists but icons/offline caching are Milestone 5).
 - i18n (explicitly deferred per your approval).
-- Vitest/Playwright test files (stack is pinned in `package.json`; test suites land alongside
-  each feature starting Milestone 3, with a dedicated pass in Milestone 5).
+- Vitest/Playwright test files (stack is pinned in `package.json`; a dedicated test-writing pass
+  is Milestone 5, alongside animation polish, performance work, and accessibility).
 
 ## Next step
 
-Milestone 3: Memberships, Attendance, Payments, Sessions.
+Milestone 5: polish, animations, performance optimization, accessibility, PWA, testing.
