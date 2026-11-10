@@ -1,4 +1,4 @@
-# GymOS — Milestones 1–4 complete
+# GymOS — Milestones 1–5 complete
 
 Milestone 1: tooling, folder structure, theme, design system, base layouts, config-driven
 navigation, mock auth, MSW + repository layer, route guards, dashboard shell.
@@ -9,6 +9,10 @@ compositions over mocked data, plus full CRUD for Members, Trainers, Meal Plans,
 Milestone 3: full CRUD for Memberships (plans), Attendance, Payments, and Sessions.
 
 Milestone 4: Reports (analytics + CSV export), Notifications, Notice Board, and Settings.
+
+Milestone 5: performance (code-splitting, virtualization, an optimistic update), animations,
+an accessibility pass, PWA (real icons, offline page, service worker), and a testing setup
+(Vitest + React Testing Library + Playwright) with real tests, not just the pinned dependencies.
 
 Every module in the original brief now has a real, working page — there are no more placeholder
 screens anywhere in the app.
@@ -29,7 +33,10 @@ pnpm install
 cp .env.example .env.local
 pnpm run msw:init      # generates public/mockServiceWorker.js (required for mock auth to work)
 pnpm run typecheck
+pnpm test               # Vitest unit/component tests
 pnpm dev
+# in a second terminal, once `pnpm dev` is running:
+pnpm run test:e2e       # Playwright end-to-end tests
 ```
 
 If `pnpm typecheck` or `pnpm dev` surface anything (a version mismatch in a pinned dependency,
@@ -38,14 +45,14 @@ a follow-up pass without touching the architecture.
 
 ## Demo accounts
 
-| Role | Email | Password |
-|---|---|---|
-| Super Admin | admin@gymos.com | Admin@123 |
-| Owner | owner@gymos.com | Owner@123 |
-| Manager | manager@gymos.com | Manager@123 |
-| Trainer | trainer@gymos.com | Trainer@123 |
+| Role         | Email               | Password      |
+| ------------ | ------------------- | ------------- |
+| Super Admin  | admin@gymos.com     | Admin@123     |
+| Owner        | owner@gymos.com     | Owner@123     |
+| Manager      | manager@gymos.com   | Manager@123   |
+| Trainer      | trainer@gymos.com   | Trainer@123   |
 | Receptionist | reception@gymos.com | Reception@123 |
-| Member | member@gymos.com | Member@123 |
+| Member       | member@gymos.com    | Member@123    |
 
 ## What's in Milestone 1
 
@@ -83,7 +90,7 @@ a follow-up pass without touching the architecture.
   owner, manager, receptionist) get the Owner dashboard, trainers get the Trainer dashboard,
   members get the Member dashboard. This is deliberately role-based, not purely permission-based
   like the sidebar — the three dashboards are a named product requirement. Individual widgets
-  *within* a variant still respect permission gates via `<RequirePermission>` (e.g. a
+  _within_ a variant still respect permission gates via `<RequirePermission>` (e.g. a
   receptionist on the Owner-variant dashboard won't see Trainer Performance, since they lack
   `trainers:read`).
 - **Owner dashboard**: Revenue, Today's Attendance, Active/New Members, Membership Expiry,
@@ -98,7 +105,7 @@ a follow-up pass without touching the architecture.
   `QuickActionsCard` / `GoalProgressCard` / chart widgets (feature-level composition — reused
   across all three dashboards instead of ~20 one-off widget files).
 - **ESLint boundaries fix**: added a `feature-types` element (a feature's `types/**` only) so
-  `mocks/fixtures/*` can depend on a feature's data *shape* without depending on its
+  `mocks/fixtures/*` can depend on a feature's data _shape_ without depending on its
   hooks/components/services — and fixed one deep cross-feature import from Milestone 1
   (`DashboardShell` now imports `useSession` from the `features/auth` barrel, not
   `features/auth/hooks` directly).
@@ -132,7 +139,7 @@ it — still true, just deferred).
 Four more full modules, same end-to-end pattern (types → schemas → repository → service → hooks
 → components → MSW handlers → fixtures → page):
 
-- **Memberships** (`features/memberships`): the *plans* themselves (Monthly Basic, Annual Elite,
+- **Memberships** (`features/memberships`): the _plans_ themselves (Monthly Basic, Annual Elite,
   etc.) — price, billing cycle, duration, active subscriber count. Create/edit/remove a plan.
   Gated by `memberships:read` / `memberships:write`. (Note: this is distinct from the **Members**
   module built in Milestone 2, which manages individual member profiles.)
@@ -173,13 +180,84 @@ Four more full modules, same end-to-end pattern (types → schemas → repositor
 
 Every module now has a real implementation — no placeholder pages remain anywhere in the app.
 
+## What's in Milestone 5
+
+**Performance**
+
+- **Code-splitting**: `DashboardView` lazy-loads whichever one of Owner/Trainer/Member dashboard
+  it needs via `next/dynamic` — a trainer's bundle never pays for the owner dashboard's charts,
+  and vice versa. `SessionsView` lazy-loads the Calendar tab (FullCalendar) separately from the
+  List tab, so FullCalendar only loads if someone clicks it. Every other route was already
+  code-split for free by the App Router's per-route chunking — these were the two real manual
+  opportunities _within_ a single route.
+- **Virtualized tables**: `DataTable` gained a `virtualize` prop (`@tanstack/react-virtual`) —
+  renders only the rows near the viewport instead of paginating. Wired into the Members table
+  (the directory most likely to grow into the hundreds/thousands for a real gym).
+- **Optimistic updates**: `useOptimisticMutation` (built in Milestone 1, never actually used
+  until now) backs "mark notification as read" — the UI updates instantly, rolls back on error.
+- **Memoization**: notification rows are `React.memo`'d so marking one read doesn't re-render
+  every other row in the list.
+
+**Animations** (Framer Motion, 150–250ms, used sparingly per the brief)
+
+- `PageTransition`: a subtle fade+slide on route change, wrapping `DashboardShell`'s content.
+- `StaggerFade`: staggers each dashboard's/report's top metric-card row in by 50ms per card.
+- Both respect `prefers-reduced-motion` via Framer Motion's `useReducedMotion()`.
+
+**Accessibility (WCAG AA)**
+
+- Skip-to-content link (keyboard-only, invisible until focused) in `DashboardShell`.
+- A global `prefers-reduced-motion` CSS rule collapses Radix/tw-animate-css's CSS-driven
+  transitions (Dialog, Sheet, Select, Popover, Command, ...) — Framer Motion components opt out
+  individually, but those don't know about the preference on their own.
+- Fixed a real bug: the Sidebar's collapse toggle had no accessible name when collapsed (icon
+  only, no `aria-label`) — now announces "Expand sidebar" / "Collapse sidebar".
+- Fixed a real bug: `CommandDialog` (⌘K search) had no `DialogTitle`, which Radix requires for
+  the dialog to be announced correctly by screen readers — added a visually-hidden one.
+- Icon-only buttons were already consistently labeled from Milestone 1 onward — audited, no
+  further gaps found.
+
+**PWA**
+
+- Real icons (192/512/512-maskable/apple-touch-icon, generated programmatically, plus a
+  multi-size `favicon.ico`) — `manifest.json` no longer points at files that don't exist.
+- `public/offline.html` — a standalone fallback page (no app-shell dependency, since it has to
+  render even when nothing else can load).
+- `public/sw.js` — a minimal, hand-written service worker (not a full Workbox precache setup):
+  network-first for navigations, falling back to the cached offline page. Registered by
+  `PwaProvider`, but **only in production and only when `NEXT_PUBLIC_API_MODE=rest`** — MSW's own
+  `mockServiceWorker.js` already owns the `/` scope in mock mode, and two service workers
+  fighting over the same scope is a real footgun, not a hypothetical one.
+
+**Testing**
+
+- `vitest.config.ts` + `src/test/setup.ts` (jsdom, jest-dom matchers, MSW server lifecycle,
+  `matchMedia`/`ResizeObserver` stubs, a default `next/navigation` mock).
+- Unit tests: `lib/permissions.test.ts` (role-union resolution), `lib/csv.test.ts` (CSV escaping
+  and the actual download trigger), `getDashboardVariant.test.ts`.
+- Component tests: `Button.test.tsx`, and an integration-style `LoginForm.test.tsx` that renders
+  the real form against the real MSW auth handler (valid login redirects, invalid login shows
+  the real error message, client-side validation blocks empty submission).
+- `playwright.config.ts` + `e2e/auth.spec.ts` (login, logout, wrong credentials, session surviving
+  a reload, unauthenticated redirect) + `e2e/permissions.spec.ts` (member blocked from
+  `/settings` with a real 403, manager sees Settings read-only, trainer can't see "Add Member").
+
+**Also fixed while auditing all of the above**: the ESLint boundaries config had several `from`
+categories (`provider`, `lib`, `config`, `store`, `feature-types`) with no rule entry at all,
+meaning `default: "disallow"` was silently rejecting every one of their legitimate imports —
+rebuilt the whole ruleset by mechanically walking every `@/...` import in the codebase and
+verified zero violations against the corrected rules. Full reasoning (including the one
+deliberate, narrow exception — Navbar's sign-out action) is in `eslint.config.mjs`'s header
+comment.
+
 ## Not yet built (by design)
 
-- PWA (manifest exists but icons/offline caching are Milestone 5).
-- i18n (explicitly deferred per your approval).
-- Vitest/Playwright test files (stack is pinned in `package.json`; a dedicated test-writing pass
-  is Milestone 5, alongside animation polish, performance work, and accessibility).
+- i18n (explicitly deferred per your approval back in Milestone 1).
+- A full Workbox-style precache/offline-first strategy — `sw.js` is intentionally minimal
+  (network-first + offline fallback), not an attempt at making the whole app work offline.
 
 ## Next step
 
-Milestone 5: polish, animations, performance optimization, accessibility, PWA, testing.
+All five milestones from the original brief are complete. From here it's your call: real backend
+integration (flip `NEXT_PUBLIC_API_MODE` to `rest` against a NestJS API matching the contracts in
+`mocks/handlers/`), deeper test coverage, or new feature work.

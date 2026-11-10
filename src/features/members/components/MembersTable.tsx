@@ -36,7 +36,10 @@ export function MembersTable() {
   const [editingMember, setEditingMember] = useState<Member | undefined>(undefined);
   const [deletingMember, setDeletingMember] = useState<Member | undefined>(undefined);
 
-  const { data, isLoading, isError, refetch } = useMembers({ search: debouncedSearch, pageSize: 500 });
+  const { data, isLoading, isError, refetch } = useMembers({
+    search: debouncedSearch,
+    pageSize: 500,
+  });
   const deleteMember = useDeleteMember();
 
   const columns = useMemo<ColumnDef<Member>[]>(
@@ -47,7 +50,7 @@ export function MembersTable() {
         cell: ({ row }) => (
           <div>
             <p className="font-medium">{row.original.name}</p>
-            <p className="text-xs text-muted-foreground">{row.original.email}</p>
+            <p className="text-muted-foreground text-xs">{row.original.email}</p>
           </div>
         ),
       },
@@ -61,7 +64,11 @@ export function MembersTable() {
           </Badge>
         ),
       },
-      { accessorKey: "trainerName", header: "Trainer", cell: ({ row }) => row.original.trainerName ?? "—" },
+      {
+        accessorKey: "trainerName",
+        header: "Trainer",
+        cell: ({ row }) => row.original.trainerName ?? "—",
+      },
       {
         accessorKey: "joinedOn",
         header: "Joined",
@@ -114,7 +121,7 @@ export function MembersTable() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative w-full sm:max-w-xs">
-          <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2" />
           <Input
             placeholder="Search members..."
             value={search}
@@ -143,7 +150,11 @@ export function MembersTable() {
         onRetry={() => refetch()}
         emptyTitle="No members yet"
         emptyDescription="Add your first member to get started."
-        pageSize={10}
+        // Members is the directory most likely to grow into the hundreds/thousands in a real
+        // gym, so it's the one list demonstrating row virtualization (Milestone 5 performance
+        // pass) instead of client-side pagination — see DataTable's `virtualize` prop.
+        virtualize
+        virtualizedHeight={560}
       />
 
       <MemberFormDialog open={formOpen} onOpenChange={setFormOpen} member={editingMember} />

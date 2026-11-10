@@ -5,14 +5,29 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Download, DollarSign, TrendingUp, UserPlus, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { MetricCard, DataTable } from "@/components/data-display";
+import { StaggerFade } from "@/components/motion";
 import { QueryBoundary } from "@/components/feedback";
 import { RequirePermission } from "@/shared/components";
 import { exportToCsv } from "@/lib/csv";
 import { useReportsSummary } from "@/features/reports/hooks";
-import { RevenueReportChart, AttendanceReportChart, MembershipGrowthChart } from "@/features/reports/components/ReportCharts";
-import { REPORT_PERIODS, type ReportPeriod, type TrainerPerformanceRow } from "@/features/reports/types";
+import {
+  RevenueReportChart,
+  AttendanceReportChart,
+  MembershipGrowthChart,
+} from "@/features/reports/components/ReportCharts";
+import {
+  REPORT_PERIODS,
+  type ReportPeriod,
+  type TrainerPerformanceRow,
+} from "@/features/reports/types";
 
 const PERIOD_LABELS: Record<ReportPeriod, string> = {
   "3m": "Last 3 months",
@@ -90,19 +105,35 @@ export function ReportsView() {
         loadingFallback={
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-28 animate-pulse rounded-xl border bg-muted/40" />
+              <div key={i} className="bg-muted/40 h-28 animate-pulse rounded-xl border" />
             ))}
           </div>
         }
       >
         {(summary) => (
           <div className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <MetricCard label="Total Revenue" value={`$${summary.totalRevenue.toLocaleString()}`} icon={DollarSign} />
-              <MetricCard label="Total Attendance" value={summary.totalAttendance.toLocaleString()} icon={TrendingUp} />
-              <MetricCard label="Net New Members" value={summary.newMembers.toLocaleString()} icon={UserPlus} />
-              <MetricCard label="Avg. Trainer Rating" value={summary.averageTrainerRating.toFixed(1)} icon={Star} />
-            </div>
+            <StaggerFade className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <MetricCard
+                label="Total Revenue"
+                value={`$${summary.totalRevenue.toLocaleString()}`}
+                icon={DollarSign}
+              />
+              <MetricCard
+                label="Total Attendance"
+                value={summary.totalAttendance.toLocaleString()}
+                icon={TrendingUp}
+              />
+              <MetricCard
+                label="Net New Members"
+                value={summary.newMembers.toLocaleString()}
+                icon={UserPlus}
+              />
+              <MetricCard
+                label="Avg. Trainer Rating"
+                value={summary.averageTrainerRating.toFixed(1)}
+                icon={Star}
+              />
+            </StaggerFade>
 
             <div className="grid gap-4 lg:grid-cols-2">
               <RevenueReportChart data={summary.revenueTrend} />

@@ -29,13 +29,15 @@ export function Sidebar() {
       <motion.aside
         animate={{ width: isCollapsed ? 72 : 248 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="hidden h-screen shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground md:flex"
+        className="bg-sidebar text-sidebar-foreground hidden h-screen shrink-0 flex-col border-r md:flex"
       >
         <div className="flex h-14 items-center gap-2 border-b px-4">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
+          <div className="bg-primary text-primary-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm font-bold">
             G
           </div>
-          {!isCollapsed && <span className="truncate text-sm font-semibold">{siteConfig.name}</span>}
+          {!isCollapsed && (
+            <span className="truncate text-sm font-semibold">{siteConfig.name}</span>
+          )}
         </div>
 
         <nav className="flex-1 space-y-4 overflow-y-auto p-3">
@@ -46,7 +48,7 @@ export function Sidebar() {
             return (
               <div key={section.title ?? `section-${sectionIndex}`} className="space-y-1">
                 {section.title && !isCollapsed && (
-                  <p className="px-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <p className="text-muted-foreground px-2 text-xs font-medium tracking-wide uppercase">
                     {section.title}
                   </p>
                 )}
@@ -91,9 +93,14 @@ export function Sidebar() {
             variant="ghost"
             size="sm"
             onClick={toggleSidebar}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             className={cn("w-full", isCollapsed ? "justify-center px-0" : "justify-start gap-2")}
           >
-            {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+            {isCollapsed ? (
+              <PanelLeftOpen className="h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" />
+            )}
             {!isCollapsed && "Collapse"}
           </Button>
         </div>

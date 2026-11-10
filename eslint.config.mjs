@@ -6,11 +6,28 @@ const compat = new FlatCompat({ baseDirectory: import.meta.dirname });
 /**
  * Feature-isolation boundaries (see docs/GymOS-Architecture-v1.md §3).
  *
- * Element types map to folders. Rules below encode the allowed dependency
- * graph so a violation fails lint, not code review:
- *  - `feature` may not import another `feature`'s internals — only its `index.ts` barrel.
- *  - `ui` (design system) may never import `feature`, `store`, or `app`.
- *  - only `repository` elements may import `mocks` or the http client.
+ * Element types map to folders. The rules below encode the allowed
+ * dependency graph so a violation fails lint, not code review. This list
+ * was rebuilt for Milestone 5 by mechanically walking every `@/...` import
+ * in the codebase and classifying both sides — several `from` categories
+ * (provider, lib, config, store, feature-types) had NO rule entry at all
+ * before this pass, meaning `default: "disallow"` was silently rejecting
+ * every one of their imports. That's now fixed.
+ *
+ * Two things this config does NOT fully enforce, called out honestly
+ * rather than papered over with an untested "fix":
+ *  - `feature -> feature` only distinguishes "some other feature" from
+ *    "this feature", not "via the public barrel" vs. "a deep internal
+ *    import". Precisely restricting that requires eslint-plugin-boundaries'
+ *    capture-template matching (`${from.featureName}`), which isn't wired
+ *    up here. In practice this repo has zero cross-feature deep imports
+ *    (verified by grepping for `@/features/*\/(hooks|components|...)` from
+ *    outside that feature after every milestone) — enforced by convention
+ *    + review today, not by this file.
+ *  - `ui -> feature` is allowed narrowly for app-shell chrome (Navbar's
+ *    sign-out action needs `features/auth`). Pure design-system primitives
+ *    (button, input, card, ...) never do this in practice; if one starts
+ *    to, that's a real review flag even though this config won't catch it.
  */
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
@@ -56,13 +73,21 @@ const eslintConfig = [
           default: "disallow",
           rules: [
             { from: "app", allow: ["layout", "provider", "feature", "feature-types", "ui", "shared", "hooks", "config", "store", "types", "constants"] },
-            { from: "ui", allow: ["ui", "hooks", "lib", "types"] },
+            // `feature` (Navbar -> features/auth for sign-out) is the one
+            // narrow exception to "ui never depends on business logic" —
+            // see the file-level comment above.
+            { from: "ui", allow: ["ui", "hooks", "lib", "types", "config", "constants", "store", "feature"] },
             { from: "shared", allow: ["ui", "hooks", "lib", "types", "shared"] },
             { from: "layout", allow: ["ui", "shared", "hooks", "feature", "feature-types", "config", "store", "lib", "types"] },
-            { from: "feature", allow: ["ui", "shared", "hooks", "lib", "types", "constants", "config", "store", "feature", "feature-types"] },
+            { from: "feature", allow: ["ui", "shared", "hooks", "lib", "types", "constants", "config", "store", "feature", "feature-types", "repository"] },
+            { from: "feature-types", allow: ["repository", "types"] },
             { from: "hooks", allow: ["lib", "store", "config", "types"] },
             { from: "repository", allow: ["lib", "types", "mocks", "repository", "feature-types"] },
-            { from: "mocks", allow: ["types", "lib", "feature-types"] },
+            { from: "mocks", allow: ["types", "lib", "config", "feature-types"] },
+            { from: "provider", allow: ["provider", "ui", "lib", "config", "mocks", "types"] },
+            { from: "lib", allow: ["config", "types"] },
+            { from: "config", allow: ["constants", "types"] },
+            { from: "store", allow: ["lib", "types"] },
           ],
         },
       ],

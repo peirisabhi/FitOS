@@ -113,3 +113,23 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
+/*
+ * WCAG 2.3.3 (Animation from Interactions) — Milestone 5 accessibility pass.
+ * Framer Motion components opt out via `useReducedMotion()` individually
+ * (see components/motion/*), but Radix/tw-animate-css's CSS-driven
+ * enter/exit transitions (Dialog, Sheet, DropdownMenu, Select, Popover,
+ * Tooltip, Command) don't know about the preference on their own — this
+ * global rule collapses all of them to instant, motion-free transitions
+ * for anyone with "reduce motion" set at the OS level.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

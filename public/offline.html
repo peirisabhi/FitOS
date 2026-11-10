@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>You're offline · GymOS</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        background: #ffffff;
+        color: #0a0a0a;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #0a0a0a;
+          color: #fafafa;
+        }
+      }
+      .card {
+        max-width: 24rem;
+        text-align: center;
+        padding: 2rem;
+      }
+      .mark {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: #0a0a0a;
+        color: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin: 0 auto 1.25rem;
+      }
+      @media (prefers-color-scheme: dark) {
+        .mark {
+          background: #fafafa;
+          color: #0a0a0a;
+        }
+      }
+      h1 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem;
+      }
+      p {
+        font-size: 0.9rem;
+        opacity: 0.7;
+        line-height: 1.5;
+        margin: 0 0 1.5rem;
+      }
+      button {
+        font: inherit;
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        border: none;
+        background: #0a0a0a;
+        color: #fafafa;
+        cursor: pointer;
+      }
+      @media (prefers-color-scheme: dark) {
+        button {
+          background: #fafafa;
+          color: #0a0a0a;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="mark">G</div>
+      <h1>You&rsquo;re offline</h1>
+      <p>
+        GymOS couldn&rsquo;t reach the network. Check your connection — anything you already had
+        open will reload automatically once you&rsquo;re back online.
+      </p>
+      <button onclick="location.reload()">Try again</button>
+    </div>
+  </body>
+</html>

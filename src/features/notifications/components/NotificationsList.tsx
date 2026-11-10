@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Bell, CreditCard, BadgeCheck, CalendarClock, CheckCheck, Trash2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,16 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-function NotificationRow({ notification }: { notification: Notification }) {
+/**
+ * Memoized so marking one notification read (which updates the shared
+ * query-cache array) doesn't re-render every other row in the list —
+ * each row only re-renders when its own `notification` object changes.
+ */
+const NotificationRow = memo(function NotificationRow({
+  notification,
+}: {
+  notification: Notification;
+}) {
   const { can } = usePermission();
   const markRead = useMarkNotificationRead();
   const deleteNotification = useDeleteNotification();
@@ -44,16 +54,16 @@ function NotificationRow({ notification }: { notification: Notification }) {
         !notification.read && "bg-primary/5 border-primary/20",
       )}
     >
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
-        <Icon className="h-4 w-4 text-muted-foreground" />
+      <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+        <Icon className="text-muted-foreground h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium">{notification.title}</p>
           {!notification.read && <Badge variant="secondary">New</Badge>}
         </div>
-        <p className="text-sm text-muted-foreground">{notification.message}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{timeAgo(notification.createdAt)}</p>
+        <p className="text-muted-foreground text-sm">{notification.message}</p>
+        <p className="text-muted-foreground mt-1 text-xs">{timeAgo(notification.createdAt)}</p>
       </div>
       {can("notifications:write") && (
         <div className="flex shrink-0 gap-1">
@@ -79,7 +89,7 @@ function NotificationRow({ notification }: { notification: Notification }) {
       )}
     </div>
   );
-}
+});
 
 export function NotificationsList() {
   const { data, isLoading, isError, refetch } = useNotifications({ pageSize: 100 });
@@ -90,11 +100,16 @@ export function NotificationsList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
         </p>
         <RequirePermission permission="notifications:write">
-          <Button variant="outline" size="sm" disabled={unreadCount === 0} onClick={() => markAllRead.mutate()}>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={unreadCount === 0}
+            onClick={() => markAllRead.mutate()}
+          >
             <CheckCheck className="h-4 w-4" />
             Mark all as read
           </Button>
@@ -111,7 +126,7 @@ export function NotificationsList() {
         loadingFallback={
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-20 animate-pulse rounded-lg border bg-muted/40" />
+              <div key={i} className="bg-muted/40 h-20 animate-pulse rounded-lg border" />
             ))}
           </div>
         }

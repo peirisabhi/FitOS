@@ -2,18 +2,25 @@
 
 import { Activity, BadgeCheck } from "lucide-react";
 import { DashboardCard, MetricCard } from "@/components/data-display";
+import { StaggerFade } from "@/components/motion";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { QueryBoundary } from "@/components/feedback";
 import { useMemberDashboard } from "@/features/dashboard/hooks";
-import { ListWidgetCard, StatRow, GoalProgressCard, AttendanceHistoryChart } from "@/features/dashboard/components/widgets";
+import {
+  ListWidgetCard,
+  StatRow,
+  GoalProgressCard,
+  AttendanceHistoryChart,
+} from "@/features/dashboard/components/widgets";
 import type { MembershipStatus, PaymentHistoryItem } from "@/features/dashboard/types";
 
-const MEMBERSHIP_BADGE: Record<MembershipStatus["status"], "success" | "warning" | "destructive"> = {
-  active: "success",
-  expiring: "warning",
-  expired: "destructive",
-};
+const MEMBERSHIP_BADGE: Record<MembershipStatus["status"], "success" | "warning" | "destructive"> =
+  {
+    active: "success",
+    expiring: "warning",
+    expired: "destructive",
+  };
 
 const PAYMENT_BADGE: Record<PaymentHistoryItem["status"], "success" | "warning" | "destructive"> = {
   paid: "success",
@@ -35,14 +42,17 @@ export function MemberDashboard() {
     >
       {(dashboard) => (
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StaggerFade className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <DashboardCard title="Membership Status">
               <div className="space-y-2">
                 <p className="text-lg font-semibold">{dashboard.membership.planName}</p>
-                <Badge variant={MEMBERSHIP_BADGE[dashboard.membership.status]} className="capitalize">
+                <Badge
+                  variant={MEMBERSHIP_BADGE[dashboard.membership.status]}
+                  className="capitalize"
+                >
                   {dashboard.membership.status}
                 </Badge>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Renews {new Date(dashboard.membership.renewsOn).toLocaleDateString()}
                 </p>
               </div>
@@ -65,15 +75,17 @@ export function MemberDashboard() {
             <DashboardCard title="Workout Plan">
               <div className="space-y-2">
                 <p className="flex items-center gap-1.5 text-sm font-medium">
-                  <BadgeCheck className="h-4 w-4 text-primary" />
+                  <BadgeCheck className="text-primary h-4 w-4" />
                   {dashboard.workoutPlan.planName}
                 </p>
-                <p className="text-xs text-muted-foreground">{dashboard.workoutPlan.focus}</p>
+                <p className="text-muted-foreground text-xs">{dashboard.workoutPlan.focus}</p>
                 <Progress value={dashboard.workoutPlan.weekProgress} />
-                <p className="text-xs text-muted-foreground">Next: {dashboard.workoutPlan.nextWorkout}</p>
+                <p className="text-muted-foreground text-xs">
+                  Next: {dashboard.workoutPlan.nextWorkout}
+                </p>
               </div>
             </DashboardCard>
-          </div>
+          </StaggerFade>
 
           <div className="grid gap-4 lg:grid-cols-2">
             <AttendanceHistoryChart data={dashboard.attendanceHistory} />
@@ -91,8 +103,11 @@ export function MemberDashboard() {
                   title={item.title}
                   subtitle={item.location}
                   trailing={
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(item.start).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    <span className="text-muted-foreground text-sm">
+                      {new Date(item.start).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </span>
                   }
                 />
@@ -143,7 +158,7 @@ function DashboardSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="h-28 animate-pulse rounded-xl border bg-muted/40" />
+        <div key={i} className="bg-muted/40 h-28 animate-pulse rounded-xl border" />
       ))}
     </div>
   );

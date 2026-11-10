@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/navigation/Sidebar";
 import { Navbar } from "@/components/navigation/Navbar";
 import { BottomNav } from "@/components/navigation/BottomNav";
 import { CommandPalette } from "@/components/overlays/CommandPalette";
+import { PageTransition } from "@/components/motion";
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
@@ -32,11 +33,24 @@ export function DashboardShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="bg-background flex h-screen overflow-hidden">
+      {/* WCAG 2.4.1 "Bypass Blocks" — invisible until focused via keyboard (Tab). */}
+      <a
+        href="#main-content"
+        className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:px-4 focus:py-2 focus:text-sm focus:font-medium"
+      >
+        Skip to main content
+      </a>
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-4 pb-20 md:p-6 md:pb-6">{children}</main>
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 overflow-y-auto p-4 pb-20 md:p-6 md:pb-6"
+        >
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
       <BottomNav />
       <CommandPalette />

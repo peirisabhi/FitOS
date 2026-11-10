@@ -2,6 +2,7 @@
 
 import { CalendarClock, Star, TrendingUp, Users } from "lucide-react";
 import { MetricCard, DashboardCard } from "@/components/data-display";
+import { StaggerFade } from "@/components/motion";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { QueryBoundary } from "@/components/feedback";
@@ -10,10 +11,30 @@ import { ListWidgetCard, StatRow, QuickActionsCard } from "@/features/dashboard/
 import { ROUTES } from "@/constants/routes";
 
 const QUICK_ACTIONS = [
-  { label: "Log Attendance", href: ROUTES.attendance, icon: CalendarClock, requiredPermissions: ["attendance:write" as const] },
-  { label: "New Session", href: ROUTES.sessions, icon: CalendarClock, requiredPermissions: ["sessions:write" as const] },
-  { label: "Update Workout Plan", href: ROUTES.workoutPlans, icon: TrendingUp, requiredPermissions: ["workout-plans:write" as const] },
-  { label: "Update Meal Plan", href: ROUTES.mealPlans, icon: Users, requiredPermissions: ["meal-plans:write" as const] },
+  {
+    label: "Log Attendance",
+    href: ROUTES.attendance,
+    icon: CalendarClock,
+    requiredPermissions: ["attendance:write" as const],
+  },
+  {
+    label: "New Session",
+    href: ROUTES.sessions,
+    icon: CalendarClock,
+    requiredPermissions: ["sessions:write" as const],
+  },
+  {
+    label: "Update Workout Plan",
+    href: ROUTES.workoutPlans,
+    icon: TrendingUp,
+    requiredPermissions: ["workout-plans:write" as const],
+  },
+  {
+    label: "Update Meal Plan",
+    href: ROUTES.mealPlans,
+    icon: Users,
+    requiredPermissions: ["meal-plans:write" as const],
+  },
 ];
 
 function formatTime(iso: string): string {
@@ -36,7 +57,7 @@ export function TrainerDashboard() {
         <div className="space-y-6">
           <QuickActionsCard actions={QUICK_ACTIONS} />
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StaggerFade className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <MetricCard
               label="Attendance (this week)"
               value={dashboard.attendanceThisWeek.toString()}
@@ -44,10 +65,22 @@ export function TrainerDashboard() {
               trend={dashboard.attendanceTrendPct}
               trendLabel="vs last week"
             />
-            <MetricCard label="Sessions (this month)" value={dashboard.sessionsCompletedThisMonth.toString()} icon={TrendingUp} />
-            <MetricCard label="Average Rating" value={dashboard.averageRating.toFixed(1)} icon={Star} />
-            <MetricCard label="Member Retention" value={`${dashboard.memberRetentionRate}%`} icon={Users} />
-          </div>
+            <MetricCard
+              label="Sessions (this month)"
+              value={dashboard.sessionsCompletedThisMonth.toString()}
+              icon={TrendingUp}
+            />
+            <MetricCard
+              label="Average Rating"
+              value={dashboard.averageRating.toFixed(1)}
+              icon={Star}
+            />
+            <MetricCard
+              label="Member Retention"
+              value={`${dashboard.memberRetentionRate}%`}
+              icon={Users}
+            />
+          </StaggerFade>
 
           <div className="grid gap-4 lg:grid-cols-2">
             <ListWidgetCard
@@ -59,7 +92,9 @@ export function TrainerDashboard() {
                 <StatRow
                   title={item.title}
                   subtitle={item.memberName ?? item.location}
-                  trailing={<span className="text-sm text-muted-foreground">{formatTime(item.start)}</span>}
+                  trailing={
+                    <span className="text-muted-foreground text-sm">{formatTime(item.start)}</span>
+                  }
                 />
               )}
             />
@@ -73,8 +108,11 @@ export function TrainerDashboard() {
                   title={item.title}
                   subtitle={item.memberName ?? item.location}
                   trailing={
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(item.start).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    <span className="text-muted-foreground text-sm">
+                      {new Date(item.start).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </span>
                   }
                 />
@@ -150,7 +188,7 @@ function DashboardSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="h-28 animate-pulse rounded-xl border bg-muted/40" />
+        <div key={i} className="bg-muted/40 h-28 animate-pulse rounded-xl border" />
       ))}
     </div>
   );

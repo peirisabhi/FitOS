@@ -1,7 +1,17 @@
 "use client";
 
-import { Users, UserPlus, CalendarCheck, CreditCard, UserPlus2, Wallet, CalendarPlus, Megaphone } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  CalendarCheck,
+  CreditCard,
+  UserPlus2,
+  Wallet,
+  CalendarPlus,
+  Megaphone,
+} from "lucide-react";
 import { MetricCard, DashboardCard, Timeline, Calendar } from "@/components/data-display";
+import { StaggerFade } from "@/components/motion";
 import { Badge } from "@/components/ui/badge";
 import { QueryBoundary } from "@/components/feedback";
 import { RequirePermission } from "@/shared/components";
@@ -17,10 +27,30 @@ import {
 import { ROUTES } from "@/constants/routes";
 
 const QUICK_ACTIONS = [
-  { label: "Add Member", href: ROUTES.members, icon: UserPlus2, requiredPermissions: ["members:write" as const] },
-  { label: "Record Payment", href: ROUTES.payments, icon: Wallet, requiredPermissions: ["payments:write" as const] },
-  { label: "New Session", href: ROUTES.sessions, icon: CalendarPlus, requiredPermissions: ["sessions:write" as const] },
-  { label: "Post Announcement", href: ROUTES.noticeBoard, icon: Megaphone, requiredPermissions: ["notice-board:write" as const] },
+  {
+    label: "Add Member",
+    href: ROUTES.members,
+    icon: UserPlus2,
+    requiredPermissions: ["members:write" as const],
+  },
+  {
+    label: "Record Payment",
+    href: ROUTES.payments,
+    icon: Wallet,
+    requiredPermissions: ["payments:write" as const],
+  },
+  {
+    label: "New Session",
+    href: ROUTES.sessions,
+    icon: CalendarPlus,
+    requiredPermissions: ["sessions:write" as const],
+  },
+  {
+    label: "Post Announcement",
+    href: ROUTES.noticeBoard,
+    icon: Megaphone,
+    requiredPermissions: ["notice-board:write" as const],
+  },
 ];
 
 function expiryBadgeVariant(daysRemaining: number): "destructive" | "warning" | "secondary" {
@@ -43,11 +73,13 @@ export function OwnerDashboard() {
     >
       {(dashboard) => (
         <div className="space-y-6">
-          <RequirePermission permission={["members:write", "payments:write", "sessions:write", "notice-board:write"]}>
+          <RequirePermission
+            permission={["members:write", "payments:write", "sessions:write", "notice-board:write"]}
+          >
             <QuickActionsCard actions={QUICK_ACTIONS} />
           </RequirePermission>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StaggerFade className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <RequirePermission permission="payments:read">
               <MetricCard
                 label="Revenue (MTD)"
@@ -76,9 +108,13 @@ export function OwnerDashboard() {
               />
             </RequirePermission>
             <RequirePermission permission="members:read">
-              <MetricCard label="New Members (MTD)" value={dashboard.newMembersThisMonth.toString()} icon={UserPlus} />
+              <MetricCard
+                label="New Members (MTD)"
+                value={dashboard.newMembersThisMonth.toString()}
+                icon={UserPlus}
+              />
             </RequirePermission>
-          </div>
+          </StaggerFade>
 
           <div className="grid gap-4 lg:grid-cols-2">
             <RequirePermission permission="payments:read">
@@ -122,7 +158,9 @@ export function OwnerDashboard() {
                     title={item.memberName}
                     subtitle={item.planName}
                     trailing={
-                      <Badge variant={expiryBadgeVariant(item.daysRemaining)}>{item.daysRemaining}d left</Badge>
+                      <Badge variant={expiryBadgeVariant(item.daysRemaining)}>
+                        {item.daysRemaining}d left
+                      </Badge>
                     }
                   />
                 )}
@@ -213,7 +251,7 @@ function DashboardSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="h-28 animate-pulse rounded-xl border bg-muted/40" />
+        <div key={i} className="bg-muted/40 h-28 animate-pulse rounded-xl border" />
       ))}
     </div>
   );

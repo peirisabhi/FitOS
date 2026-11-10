@@ -6,8 +6,12 @@ import { toast } from "sonner";
 interface OptimisticMutationOptions<TData, TVariables, TContext> {
   mutationFn: (variables: TVariables) => Promise<TData>;
   queryKey: QueryKey;
-  /** Compute the optimistic cache value from the previous value + the pending variables. */
-  updater: (previous: TData | undefined, variables: TVariables) => TData;
+  /**
+   * Compute the optimistic cache value from the previous value + the
+   * pending variables. Return `undefined` (e.g. when there's no cached
+   * value yet) to leave the cache untouched.
+   */
+  updater: (previous: TData | undefined, variables: TVariables) => TData | undefined;
   successMessage?: string;
   errorMessage?: string;
   context?: TContext;
