@@ -1,11 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from "vitest";
 import { exportToCsv } from "@/lib/csv";
 
 describe("exportToCsv", () => {
   let capturedBlob: Blob | undefined;
-  let createObjectURLSpy: ReturnType<typeof vi.spyOn>;
-  let revokeObjectURLSpy: ReturnType<typeof vi.spyOn>;
-  let clickSpy: ReturnType<typeof vi.spyOn>;
+  let createObjectURLSpy: MockInstance;
+  let revokeObjectURLSpy: MockInstance;
+  let clickSpy: MockInstance;
 
   beforeEach(() => {
     capturedBlob = undefined;

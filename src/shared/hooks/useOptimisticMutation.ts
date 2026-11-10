@@ -3,8 +3,8 @@
 import { useMutation, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-interface OptimisticMutationOptions<TData, TVariables, TContext> {
-  mutationFn: (variables: TVariables) => Promise<TData>;
+interface OptimisticMutationOptions<TData, TVariables, TMutationData, TContext> {
+  mutationFn: (variables: TVariables) => Promise<TMutationData>;
   queryKey: QueryKey;
   /**
    * Compute the optimistic cache value from the previous value + the
@@ -23,13 +23,13 @@ interface OptimisticMutationOptions<TData, TVariables, TContext> {
  * Every mutation that should feel instant (toggling status, quick edits)
  * uses this instead of hand-rolling onMutate/onError per feature.
  */
-export function useOptimisticMutation<TData, TVariables>({
+export function useOptimisticMutation<TData, TVariables, TMutationData = unknown>({
   mutationFn,
   queryKey,
   updater,
   successMessage,
   errorMessage = "Something went wrong. Changes were reverted.",
-}: OptimisticMutationOptions<TData, TVariables, unknown>) {
+}: OptimisticMutationOptions<TData, TVariables, TMutationData, unknown>) {
   const queryClient = useQueryClient();
 
   return useMutation({

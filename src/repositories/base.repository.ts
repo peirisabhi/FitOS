@@ -11,13 +11,13 @@
  * started (see providers/MockProvider.tsx), gated by
  * `NEXT_PUBLIC_API_MODE`. See architecture doc §1.1 and §7.
  */
-export interface ListQueryParams {
+export type ListQueryParams = {
   page?: number;
   pageSize?: number;
   search?: string;
   sortBy?: string;
   sortDir?: "asc" | "desc";
-}
+};
 
 export interface PaginatedResult<T> {
   items: T[];

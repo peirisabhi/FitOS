@@ -94,7 +94,7 @@ const eslintConfig = [
     },
   },
   {
-    ignores: [".next/**", "node_modules/**", "public/**", "playwright-report/**"],
+    ignores: [".next/**", "node_modules/**", "public/**", "playwright-report/**", "next-env.d.ts"],
   },
 ];
 

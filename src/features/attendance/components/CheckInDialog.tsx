@@ -13,8 +13,21 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { checkInFormSchema, type CheckInFormValues } from "@/features/attendance/schemas";
 import { useCheckIn } from "@/features/attendance/hooks";
 import { CHECK_IN_METHODS } from "@/features/attendance/types";
@@ -25,7 +38,13 @@ const METHOD_LABELS: Record<(typeof CHECK_IN_METHODS)[number], string> = {
   biometric: "Biometric",
 };
 
-export function CheckInDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+export function CheckInDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const checkIn = useCheckIn();
 
   const form = useForm<CheckInFormValues>({
@@ -44,7 +63,7 @@ export function CheckInDialog({ open, onOpenChange }: { open: boolean; onOpenCha
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Log check-in</DialogTitle>
-          <DialogDescription>Record a member's arrival at the front desk.</DialogDescription>
+          <DialogDescription>Record a member&apos;s arrival at the front desk.</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
